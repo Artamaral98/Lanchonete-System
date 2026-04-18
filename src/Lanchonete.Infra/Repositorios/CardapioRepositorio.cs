@@ -11,8 +11,8 @@ public sealed class CardapioRepositorio : ICardapioRepositorio
         new() { Nome = "X Burger", Preco = 5.00m, Categoria = CategoriaItemCardapio.Sanduiche },
         new() { Nome = "X Egg", Preco = 4.50m, Categoria = CategoriaItemCardapio.Sanduiche },
         new() { Nome = "X Bacon", Preco = 7.00m, Categoria = CategoriaItemCardapio.Sanduiche },
-        new() { Nome = "Batata frita", Preco = 2.00m, Categoria = CategoriaItemCardapio.Acompanhamento },
-        new() { Nome = "Refrigerante", Preco = 2.50m, Categoria = CategoriaItemCardapio.Acompanhamento }
+        new() { Nome = "Batata frita", Preco = 2.00m, Categoria = CategoriaItemCardapio.Batata },
+        new() { Nome = "Refrigerante", Preco = 2.50m, Categoria = CategoriaItemCardapio.Bebida }
     ];
 
     public List<CardapioItem> ObterTodos() => [.. ItensCardapio];

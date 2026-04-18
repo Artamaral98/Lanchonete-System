@@ -9,4 +9,6 @@ public static class Messages
     public const string PedidoComItensDuplicados = "O pedido não pode conter itens duplicados.";
     public const string PedidoNaoEncontrado = "Pedido não encontrado.";
     public const string ItemCardapioNaoEncontrado = "Item do cardápio não encontrado.";
+    public const string PedidoSemSanduiche = "O pedido deve conter exatamente um sanduíche.";
+    public const string PedidoMuitosSanduiches = "O pedido não pode conter mais de um sanduíche.";
 }
