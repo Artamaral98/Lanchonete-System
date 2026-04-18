@@ -1,0 +1,33 @@
+.scene {
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a0f2e 40%, #0f1a1a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    animation: blob-float 10s ease-in-out infinite;
+}
+
+.blob1 { width: 300px; height: 300px; background: #6c3fff; top: -60px; left: -60px; }
+.blob2 { width: 250px; height: 250px; background: #00d4aa; bottom: -40px; right: 40px; }
+.blob3 { width: 180px; height: 180px; background: #ff6b6b; top: 60%; left: 20%; }
+
+@keyframes blob-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+.auth-content {
+    position: relative;
+    z-index: 2;
+    animation: fade-in-up 0.5s ease forwards;
+}

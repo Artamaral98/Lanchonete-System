@@ -1,0 +1,96 @@
+@page "/register"
+@layout AuthLayout
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject ToastService ToastService
+
+<div class="glass-card animate-fade-in-up">
+    <div class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00d4aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+        </div>
+        <div class="logo-title">Criar Conta</div>
+        <div class="logo-sub">Junte-se ao sistema de lanchonete</div>
+    </div>
+
+    <EditForm Model="@_registerModel" OnValidSubmit="HandleRegister">
+        <div class="input-group">
+            <label class="input-label">Login</label>
+            <InputText @bind-Value="_registerModel.Login" class="glass-input" placeholder="Escolha um usuário" />
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Senha</label>
+            <InputText @bind-Value="_registerModel.Senha" type="password" class="glass-input" placeholder="••••••••" />
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Confirmar Senha</label>
+            <InputText @bind-Value="_confirmarSenha" type="password" class="glass-input" placeholder="••••••••" />
+        </div>
+
+        @if (_isLoading)
+        {
+            <button type="button" class="btn-primary" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando...
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn-primary">Registrar</button>
+        }
+
+        @foreach (var erro in _erros)
+        {
+            <div class="error-message">@erro</div>
+        }
+    </EditForm>
+
+    <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">OU</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <div class="link-row">
+        <span>Já tem uma conta?</span>
+        <a href="login">Fazer Login</a>
+    </div>
+</div>
+
+@code {
+    private CriarUsuarioInputDto _registerModel = new();
+    private string _confirmarSenha = "";
+    private List<string> _erros = new();
+    private bool _isLoading;
+
+    private async Task HandleRegister()
+    {
+        if (_registerModel.Senha != _confirmarSenha)
+        {
+            _erros = new List<string> { "As senhas não conferem." };
+            return;
+        }
+
+        _isLoading = true;
+        _erros.Clear();
+
+        var resultado = await AuthService.Register(_registerModel);
+
+        if (resultado.Erros.Any())
+        {
+            _erros = resultado.Erros;
+            _isLoading = false;
+        }
+        else
+        {
+            ToastService.ShowSuccess("Conta criada com sucesso!");
+            Navigation.NavigateTo("");
+        }
+    }
+}

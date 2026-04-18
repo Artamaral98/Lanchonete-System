@@ -1,0 +1,82 @@
+@page "/login"
+@layout AuthLayout
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject ToastService ToastService
+
+<div class="glass-card animate-fade-in-up">
+    <div class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        </div>
+        <div class="logo-title">Lanchonete System</div>
+        <div class="logo-sub">Entre para gerenciar seus pedidos</div>
+    </div>
+
+    <EditForm Model="@_loginModel" OnValidSubmit="HandleLogin">
+        <div class="input-group">
+            <label class="input-label">Login</label>
+            <InputText @bind-Value="_loginModel.Login" class="glass-input" placeholder="Seu nome de usuário" />
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Senha</label>
+            <InputText @bind-Value="_loginModel.Senha" type="password" class="glass-input" placeholder="••••••••" />
+        </div>
+
+        @if (_isLoading)
+        {
+            <button type="button" class="btn-primary" disabled>
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn-primary">Entrar</button>
+        }
+
+        @foreach (var erro in _erros)
+        {
+            <div class="error-message">@erro</div>
+        }
+    </EditForm>
+
+    <div class="divider">
+        <div class="divider-line"></div>
+        <div class="divider-text">OU</div>
+        <div class="divider-line"></div>
+    </div>
+
+    <div class="link-row">
+        <span>Não tem uma conta?</span>
+        <a href="register">Criar conta</a>
+    </div>
+</div>
+
+@code {
+    private LoginInputDto _loginModel = new();
+    private List<string> _erros = new();
+    private bool _isLoading;
+
+    private async Task HandleLogin()
+    {
+        _isLoading = true;
+        _erros.Clear();
+
+        var resultado = await AuthService.Login(_loginModel);
+
+        if (resultado.Erros.Any())
+        {
+            _erros = resultado.Erros;
+            _isLoading = false;
+        }
+        else
+        {
+            ToastService.ShowSuccess("Login realizado com sucesso!");
+            Navigation.NavigateTo("");
+        }
+    }
+}

@@ -43,3 +43,14 @@ packages/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# AI and Tooling
+.gemini/
+.antigravity/
+.brain/
+
+# Web and Environment
+node_modules/
+.env
+.env.*
+!.env.example

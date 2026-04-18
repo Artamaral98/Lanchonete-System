@@ -1,0 +1,52 @@
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.glass-toast {
+    min-width: 300px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.toast-close:hover {
+    color: #fff;
+}
+
+/* Colors by level */
+.glass-toast.success { border-left: 4px solid var(--color-accent-green); }
+.glass-toast.error { border-left: 4px solid var(--color-accent-red); }
+.glass-toast.warning { border-left: 4px solid var(--color-accent-amber); }
+.glass-toast.info { border-left: 4px solid var(--color-primary); }

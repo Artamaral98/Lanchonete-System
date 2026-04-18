@@ -1,0 +1,23 @@
+@inherits LayoutComponentBase
+@using Lanchonete.Frontend.Components.UI
+
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<div class="page-wrapper">
+    <NavMenu />
+
+    <main>
+        <div class="content px-4">
+            @Body
+        </div>
+    </main>
+</div>
+
+<Toast />
+
+@code {
+}

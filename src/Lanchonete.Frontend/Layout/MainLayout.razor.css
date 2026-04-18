@@ -1,0 +1,22 @@
+.page-wrapper {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.content {
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fade-in-up 0.5s ease forwards;
+}
+
+@media (max-width: 768px) {
+    .page-wrapper {
+        flex-direction: column;
+    }
+}

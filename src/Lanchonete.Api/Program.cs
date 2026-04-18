@@ -12,6 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 var jwt = builder.Configuration.GetSection(JwtConfiguracao.Secao).Get<JwtConfiguracao>() ?? new JwtConfiguracao();
 
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorCors", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -73,6 +83,7 @@ builder.Services.AdicionarInfraestrutura(builder.Configuration);
 var app = builder.Build();
 
 app.UseMiddleware<TratamentoExcecaoMiddleware>();
+app.UseCors("BlazorCors");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
