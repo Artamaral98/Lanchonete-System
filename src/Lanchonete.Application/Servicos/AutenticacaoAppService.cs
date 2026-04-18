@@ -6,7 +6,7 @@ using Lanchonete.Domain.Exceptions;
 
 namespace Lanchonete.Application.Servicos;
 
-public sealed class AutenticacaoAppService(
+public class AutenticacaoAppService(
     IValidadorCredencialServico validadorCredencialServico,
     IGeradorTokenServico geradorTokenServico) : IAutenticacaoAppService
 {

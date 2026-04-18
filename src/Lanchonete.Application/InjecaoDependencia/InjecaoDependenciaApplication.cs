@@ -9,6 +9,8 @@ public static class InjecaoDependenciaApplication
     public static IServiceCollection AdicionarApplication(this IServiceCollection services)
     {
         services.AddScoped<IAutenticacaoAppService, AutenticacaoAppService>();
+        services.AddScoped<ICardapioAppService, CardapioAppService>();
+        services.AddScoped<IPedidoAppService, PedidoAppService>();
         return services;
     }
 }

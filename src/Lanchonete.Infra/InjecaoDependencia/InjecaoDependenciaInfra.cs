@@ -1,5 +1,6 @@
 using Lanchonete.Application.Interfaces;
 using Lanchonete.Infra.Configuracoes;
+using Lanchonete.Infra.Repositorios;
 using Lanchonete.Infra.Servicos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,8 @@ public static class InjecaoDependenciaInfra
 
         services.AddScoped<IValidadorCredencialServico, ValidadorCredencialServico>();
         services.AddScoped<IGeradorTokenServico, GeradorTokenServico>();
+        services.AddSingleton<ICardapioRepositorio, CardapioRepositorio>();
+        services.AddSingleton<IPedidoRepositorio, PedidoRepositorio>();
 
         return services;
     }

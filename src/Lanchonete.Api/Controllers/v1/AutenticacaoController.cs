@@ -7,10 +7,10 @@ namespace Lanchonete.Api.Controllers.v1;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/autenticacao")]
+[Route("api/v1/[controller]/[action]")]
 public sealed class AutenticacaoController(IAutenticacaoAppService autenticacaoAppService) : ControllerBase
 {
-    [HttpPost("login")]
+    [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,0 +1,11 @@
+namespace Lanchonete.Application.Dtos.Pedidos;
+
+public sealed class PedidoOutputDto
+{
+    public Guid Id { get; set; }
+    public DateTime DataCriacao { get; set; }
+    public List<PedidoItemOutputDto> Itens { get; set; } = [];
+    public decimal Subtotal { get; set; }
+    public decimal Desconto { get; set; }
+    public decimal Total { get; set; }
+}
