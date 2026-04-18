@@ -6,12 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Lanchonete.Api.Controllers.v1;
 
 [ApiController]
-[ApiVersion("1.0")]
 [Route("api/v1/[controller]/[action]")]
 public sealed class AutenticacaoController(IAutenticacaoAppService autenticacaoAppService) : ControllerBase
 {
     [HttpPost]
-    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromBody] LoginInputDto entrada)

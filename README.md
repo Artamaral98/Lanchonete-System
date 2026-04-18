@@ -17,35 +17,6 @@ API REST em .NET com arquitetura em camadas (Clean Architecture), versionamento 
 - `src/Lanchonete.Infra`: implementações de infraestrutura
 - `tests/Lanchonete.Tests`: testes automatizados
 
-## Pré-requisitos
-
-- .NET SDK 9.x instalado
-
-Verificar:
-
-```bash
-dotnet --version
-```
-
-## Como executar
-
-Na raiz do projeto:
-
-```bash
-dotnet restore
-dotnet build Lanchonete.sln
-dotnet run --project src/Lanchonete.Api
-```
-
-Swagger:
-
-- `https://localhost:xxxx/swagger` (a porta aparece no terminal ao subir a API)
-
-## Como rodar os testes
-
-```bash
-dotnet test Lanchonete.sln
-```
 
 ## Autenticação (JWT)
 
@@ -60,16 +31,5 @@ Credenciais padrão de desenvolvimento (em `appsettings.json`):
 
 O login retorna um token JWT para usar nos endpoints protegidos.
 
-## Observações para handoff
 
-- O arquivo `.gitignore` já está configurado para não versionar artefatos locais (`bin`, `obj`, `.vs`, `.cursor`, etc.).
-- Isso **não impede execução** do projeto por outra pessoa; apenas evita subir arquivos de máquina local e build.
-- O que é necessário para rodar está versionado no repositório (código-fonte e arquivos de projeto).
 
-## Status atual
-
-- Fundação da solução concluída
-- JWT básico configurado
-- Middleware global de exceções configurado
-- Estrutura de retorno padrão (`Dados` e `Erros`) criada
-- Testes iniciais criados e passando
