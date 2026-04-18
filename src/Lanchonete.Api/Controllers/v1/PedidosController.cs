@@ -53,7 +53,7 @@ public sealed class PedidosController(IPedidoAppService pedidoAppService) : Cont
         return Ok(resultado);
     }
 
-    [HttpPost("{id:guid}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

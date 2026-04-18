@@ -10,7 +10,7 @@ public class AutenticacaoAppService(
     IValidadorCredencialServico validadorCredencialServico,
     IGeradorTokenServico geradorTokenServico) : IAutenticacaoAppService
 {
-    public RespostaOutputDto<LoginOutputDto> GerarToken(LoginInputDto entrada)
+    public RespostaOutputDto<LoginOutputDto> RealizarLogin(LoginInputDto entrada)
     {
         var resposta = new RespostaOutputDto<LoginOutputDto>();
 

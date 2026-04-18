@@ -5,5 +5,5 @@ namespace Lanchonete.Application.Interfaces;
 
 public interface IAutenticacaoAppService
 {
-    RespostaOutputDto<LoginOutputDto> GerarToken(LoginInputDto entrada);
+    RespostaOutputDto<LoginOutputDto> RealizarLogin(LoginInputDto entrada);
 }

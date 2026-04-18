@@ -7,13 +7,13 @@ namespace Lanchonete.Tests.Application;
 public sealed class AutenticacaoAppServiceTests
 {
     [Fact]
-    public void GerarToken_DeveRetornarToken_QuandoCredencialValida()
+    public void RealizarLogin_DeveRetornarToken_QuandoCredencialValida()
     {
         var appService = new AutenticacaoAppService(
             new ValidadorCredencialFake(true),
             new GeradorTokenFake());
 
-        var resposta = appService.GerarToken(new LoginInputDto
+        var resposta = appService.RealizarLogin(new LoginInputDto
         {
             Login = "admin",
             Senha = "123456"
@@ -25,13 +25,13 @@ public sealed class AutenticacaoAppServiceTests
     }
 
     [Fact]
-    public void GerarToken_DeveRetornarErro_QuandoCredencialInvalida()
+    public void RealizarLogin_DeveRetornarErro_QuandoCredencialInvalida()
     {
         var appService = new AutenticacaoAppService(
             new ValidadorCredencialFake(false),
             new GeradorTokenFake());
 
-        var resposta = appService.GerarToken(new LoginInputDto
+        var resposta = appService.RealizarLogin(new LoginInputDto
         {
             Login = "invalido",
             Senha = "invalido"

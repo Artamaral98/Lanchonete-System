@@ -14,7 +14,7 @@ public sealed class AutenticacaoController(IAutenticacaoAppService autenticacaoA
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromBody] LoginInputDto entrada)
     {
-        var resultado = autenticacaoAppService.GerarToken(entrada);
+        var resultado = autenticacaoAppService.RealizarLogin(entrada);
         if (resultado.Erros.Count > 0)
         {
             return BadRequest(resultado);
