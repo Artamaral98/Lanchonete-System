@@ -10,10 +10,9 @@ namespace Lanchonete.Infra.Servicos;
 
 public sealed class GeradorTokenServico(IOptions<JwtConfiguracao> jwtConfiguracao) : IGeradorTokenServico
 {
-    public (string Token, DateTime ExpiraEmUtc) GerarToken(string usuario)
+    public string GerarToken(string usuario)
     {
         var dadosJwt = jwtConfiguracao.Value;
-        var expiraEmUtc = DateTime.UtcNow.AddMinutes(dadosJwt.ExpiracaoMinutos);
 
         var claims = new List<Claim>
         {
@@ -25,6 +24,8 @@ public sealed class GeradorTokenServico(IOptions<JwtConfiguracao> jwtConfiguraca
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(dadosJwt.SecretKey)),
             SecurityAlgorithms.HmacSha256);
 
+        var expiraEmUtc = DateTime.UtcNow.AddMinutes(dadosJwt.ExpiracaoMinutos);
+
         var token = new JwtSecurityToken(
             issuer: dadosJwt.Issuer,
             audience: dadosJwt.Audience,
@@ -32,6 +33,6 @@ public sealed class GeradorTokenServico(IOptions<JwtConfiguracao> jwtConfiguraca
             expires: expiraEmUtc,
             signingCredentials: credenciais);
 
-        return (new JwtSecurityTokenHandler().WriteToken(token), expiraEmUtc);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

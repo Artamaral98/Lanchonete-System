@@ -16,16 +16,15 @@ public class AutenticacaoAppService(
 
         try
         {
-            if (!validadorCredencialServico.CredencialValida(entrada.Usuario, entrada.Senha))
+            if (!validadorCredencialServico.CredencialValida(entrada.Login, entrada.Senha))
             {
                 throw new BusinessException(Messages.CredenciaisInvalidas);
             }
 
-            var (token, expiraEmUtc) = geradorTokenServico.GerarToken(entrada.Usuario);
+            var token = geradorTokenServico.GerarToken(entrada.Login);
             resposta.Dados = new LoginOutputDto
             {
-                Token = token,
-                ExpiraEmUtc = expiraEmUtc
+                Token = token
             };
         }
         catch (BusinessException ex)

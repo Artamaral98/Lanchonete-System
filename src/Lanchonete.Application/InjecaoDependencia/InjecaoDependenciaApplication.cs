@@ -11,6 +11,7 @@ public static class InjecaoDependenciaApplication
         services.AddScoped<IAutenticacaoAppService, AutenticacaoAppService>();
         services.AddScoped<ICardapioAppService, CardapioAppService>();
         services.AddScoped<IPedidoAppService, PedidoAppService>();
+        services.AddScoped<IUsuarioAppService, UsuarioAppService>();
         return services;
     }
 }

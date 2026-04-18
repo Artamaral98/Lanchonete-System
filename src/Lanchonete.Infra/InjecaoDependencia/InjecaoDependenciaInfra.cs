@@ -14,12 +14,13 @@ public static class InjecaoDependenciaInfra
         IConfiguration configuration)
     {
         services.Configure<JwtConfiguracao>(configuration.GetSection(JwtConfiguracao.Secao));
-        services.Configure<UsuarioPadraoConfiguracao>(configuration.GetSection(UsuarioPadraoConfiguracao.Secao));
 
         services.AddScoped<IValidadorCredencialServico, ValidadorCredencialServico>();
         services.AddScoped<IGeradorTokenServico, GeradorTokenServico>();
+        services.AddScoped<ICriptografiaServico, CriptografiaServico>();
         services.AddSingleton<ICardapioRepositorio, CardapioRepositorio>();
         services.AddSingleton<IPedidoRepositorio, PedidoRepositorio>();
+        services.AddSingleton<IUsuarioRepositorio, UsuarioRepositorio>();
 
         return services;
     }

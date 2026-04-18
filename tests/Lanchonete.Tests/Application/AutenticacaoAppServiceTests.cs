@@ -15,7 +15,7 @@ public sealed class AutenticacaoAppServiceTests
 
         var resposta = appService.GerarToken(new LoginInputDto
         {
-            Usuario = "admin",
+            Login = "admin",
             Senha = "123456"
         });
 
@@ -33,7 +33,7 @@ public sealed class AutenticacaoAppServiceTests
 
         var resposta = appService.GerarToken(new LoginInputDto
         {
-            Usuario = "invalido",
+            Login = "invalido",
             Senha = "invalido"
         });
 
@@ -48,7 +48,6 @@ public sealed class AutenticacaoAppServiceTests
 
     private sealed class GeradorTokenFake : IGeradorTokenServico
     {
-        public (string Token, DateTime ExpiraEmUtc) GerarToken(string usuario)
-            => ("token-fake", DateTime.UtcNow.AddMinutes(30));
+        public string GerarToken(string usuario) => "token-fake";
     }
 }
