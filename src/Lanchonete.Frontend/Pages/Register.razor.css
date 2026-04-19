@@ -83,3 +83,47 @@
     margin-top: 10px;
     text-align: center;
 }
+
+.logo-sub {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.5), rgba(0, 212, 170, 0.2));
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    outline: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.7), rgba(0, 212, 170, 0.4));
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.1);
+}

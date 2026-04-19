@@ -4,7 +4,7 @@
     </div>
 
     <nav class="flex-column">
-        <div class="nav-item px-3">
+        <div class="nav-item">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill" aria-hidden="true"></span> Pedidos
             </NavLink>
@@ -12,14 +12,14 @@
         
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <button class="nav-link btn-logout" @onclick="HandleLogout">
+                <div class="nav-item">
+                    <button type="button" class="nav-link" @onclick="HandleLogout">
                         <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Sair
                     </button>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3">
+                <div class="nav-item">
                     <NavLink class="nav-link" href="login">
                         <span class="bi bi-person-fill" aria-hidden="true"></span> Entrar
                     </NavLink>
@@ -30,11 +30,30 @@
 </div>
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
     [Inject] private NavigationManager Navigation { get; set; } = default!;
-    // Logout logic will be added when services are ready
+    [Inject] private AuthService AuthService { get; set; } = default!;
+    [Inject] private ToastService ToastService { get; set; } = default!;
 
-    private void HandleLogout()
+    protected override async Task OnInitializedAsync()
     {
-        // Logout logic
+        await AuthStateTask;
+    }
+
+    private async Task HandleLogout()
+    {
+        try
+        {
+            await AuthService.Logout();
+            ToastService.ShowInfo("Você saiu do sistema.");
+        }
+        catch
+        {
+            // Fallback em caso de erro no LocalStorage ou estado
+        }
+        finally
+        {
+            Navigation.NavigateTo("login");
+        }
     }
 }

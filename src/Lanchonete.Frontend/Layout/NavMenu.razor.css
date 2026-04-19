@@ -7,6 +7,7 @@
     padding: 20px 0;
     position: sticky;
     top: 20px;
+    z-index: 999;
 }
 
 .brand {
@@ -24,35 +25,86 @@
     -webkit-text-fill-color: transparent;
 }
 
-.nav-link {
-    color: var(--color-text-secondary);
+/* Estilos para o Botão (não sofre tanto com override) */
+/* Estilos para o Botão (Nativo, não precisa de ::deep) */
+button.nav-link {
+    color: var(--color-text-secondary) !important;
     display: flex;
     align-items: center;
-    padding: 12px 24px;
-    text-decoration: none;
-    transition: all 0.2s ease;
+    justify-content: flex-start;
+    padding: 12px 20px;
+    text-decoration: none !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 12px;
-    margin: 4px 12px;
+    margin: 4px 16px;
     border: 1px solid transparent;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    cursor: pointer;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-.nav-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+button.nav-link:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+    transform: translateX(6px);
 }
 
-.nav-link.active {
-    color: #fff;
+/* Usando ::deep para alcançar o <a> dentro do componente NavLink */
+::deep a.nav-link,
+::deep a.nav-link:hover,
+::deep a.nav-link:focus,
+::deep a.nav-link:visited {
+    color: var(--color-text-secondary) !important;
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    margin: 4px 16px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    cursor: pointer;
+    width: calc(100% - 32px);
+    box-sizing: border-box;
+    outline: none;
+}
+
+::deep a.nav-link:hover {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+    transform: translateX(6px);
+}
+
+::deep a.nav-link.active {
+    color: #fff !important;
     background: var(--color-primary);
     border: 1px solid var(--color-primary-border);
+    box-shadow: 0 4px 15px rgba(108, 63, 255, 0.2);
 }
 
-.btn-logout {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
+/* Ícones */
+::deep .nav-link span,
+button.nav-link span {
+    margin-right: 12px;
+    font-size: 1.1rem;
 }
 
 @media (max-width: 768px) {
