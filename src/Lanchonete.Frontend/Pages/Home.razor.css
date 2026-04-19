@@ -52,8 +52,88 @@ h2 {
     background: rgba(255, 255, 255, 0.1);
 }
 
-.content-section p {
-    color: rgba(255, 255, 255, 0.7);
+.content-section {
+    padding-top: 4px;
+}
+
+.status-msg {
+    color: rgba(255, 255, 255, 0.5);
     font-size: 14px;
-    line-height: 1.5;
+    padding: 20px 0;
+}
+
+.error-msg {
+    color: rgba(255, 100, 100, 0.8);
+}
+
+/* Lista de Pedidos */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.order-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.order-row-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.order-id {
+    font-family: monospace;
+    font-weight: 700;
+    color: rgba(108, 63, 255, 0.9);
+    font-size: 14px;
+}
+
+.order-date {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 12px;
+    flex: 1;
+}
+
+.order-total {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+/* Itens do Pedido */
+.order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 10px;
+}
+
+.order-item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.item-qty {
+    color: rgba(108, 63, 255, 0.9);
+    font-weight: 600;
+    min-width: 30px;
+}
+
+.item-name {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.item-subtotal {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
 }

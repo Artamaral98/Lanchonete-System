@@ -10,18 +10,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Configuração do HttpClient Base (sem interceptor para Auth)
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5035") });
+// Handler de autorização (DEVE ser Transient para funcionar com HttpClientFactory)
+builder.Services.AddTransient<JwtAuthorizationMessageHandler>();
 
-// Registrar o Handler de Autorização
-builder.Services.AddScoped<JwtAuthorizationMessageHandler>();
+// Configuração dos Serviços com HttpClients Tipados (já incluem o Handler de Auth)
+builder.Services.AddHttpClient<AuthService>(client => client.BaseAddress = new Uri("https://localhost:7247"));
 
-// Registrar HttpClient Autenticado para serviços que precisam de Token
-builder.Services.AddHttpClient("LanchoneteAPI", client => client.BaseAddress = new Uri("http://localhost:5035"))
+builder.Services.AddHttpClient<CardapioService>(client => client.BaseAddress = new Uri("https://localhost:7247"))
     .AddHttpMessageHandler<JwtAuthorizationMessageHandler>();
 
-// Injetar o HttpClient nomeado como padrão para os serviços
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("LanchoneteAPI"));
+builder.Services.AddHttpClient<PedidoService>(client => client.BaseAddress = new Uri("https://localhost:7247"))
+    .AddHttpMessageHandler<JwtAuthorizationMessageHandler>();
 
 // LocalStorage
 builder.Services.AddBlazoredLocalStorage();
@@ -30,10 +29,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
-// Serviços de Negócio
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<CardapioService>();
-builder.Services.AddScoped<PedidoService>();
+// Serviços
 builder.Services.AddScoped<ToastService>();
 
 await builder.Build().RunAsync();

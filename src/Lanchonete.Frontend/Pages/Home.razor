@@ -1,4 +1,7 @@
 @page "/"
+@using Microsoft.AspNetCore.Authorization
+@using Lanchonete.Frontend.Models
+@using Lanchonete.Frontend.Services
 @attribute [Authorize]
 
 <div class="animate-fade-in-up">
@@ -15,14 +18,96 @@
                 <p class="subtitle">Gerencie seus pedidos com facilidade.</p>
             </div>
         </div>
-        
+
         <div class="divider">
             <div class="divider-line"></div>
         </div>
 
         <div class="content-section">
-            <p>Se você está vendo isso, está autenticado e pronto para usar o sistema!</p>
-            <!-- A listagem de pedidos entrará aqui futuramente -->
+            @if (_isLoading)
+            {
+                <p class="status-msg">Carregando pedidos...</p>
+            }
+            else if (_erroMensagem != null)
+            {
+                <p class="status-msg error-msg">@_erroMensagem</p>
+            }
+            else if (_pedidos.Count == 0)
+            {
+                <p class="status-msg">Nenhum pedido encontrado.</p>
+            }
+            else
+            {
+                <div class="orders-list">
+                    @foreach (var pedido in _pedidos)
+                    {
+                        <div class="order-item">
+                            <div class="order-row-header">
+                                <span class="order-id">#@(pedido.Id.ToString().Length > 8 ? pedido.Id.ToString().Substring(0, 8) : pedido.Id.ToString())</span>
+                                <span class="order-date">@pedido.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
+                                <span class="order-total">Total: @pedido.Total.ToString("C")</span>
+                            </div>
+                            <div class="order-items-list">
+                                @if (pedido.Itens != null)
+                                {
+                                    @foreach (var item in pedido.Itens)
+                                    {
+                                        <div class="order-item-row">
+                                            <span class="item-qty">@item.Quantidade x</span>
+                                            <span class="item-name">@item.NomeItem</span>
+                                            <span class="item-subtotal">@item.SubtotalItem.ToString("C")</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 </div>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+    [Inject] private PedidoService PedidoService { get; set; } = default!;
+
+    private List<PedidoOutputDto> _pedidos = [];
+    private bool _isLoading = true;
+    private string? _erroMensagem;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        try
+        {
+            _isLoading = true;
+            _erroMensagem = null;
+
+            // JS Interop garantidamente disponível aqui
+            var authState = await AuthStateTask;
+            if (authState.User.Identity?.IsAuthenticated != true)
+            {
+                _erroMensagem = "Usuário não autenticado.";
+                return;
+            }
+
+            var response = await PedidoService.GetPedidos();
+
+            if (response.Erros?.Count > 0)
+                _erroMensagem = string.Join(", ", response.Erros);
+            else
+                _pedidos = response.Dados ?? [];
+        }
+        catch (Exception ex)
+        {
+            _erroMensagem = "Erro de conexão: " + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged(); // necessário pois OnAfterRender não re-renderiza automaticamente
+        }
+    }
+}

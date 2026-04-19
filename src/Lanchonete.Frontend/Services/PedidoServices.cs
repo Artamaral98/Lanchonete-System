@@ -16,8 +16,26 @@ public sealed class PedidoService(HttpClient httpClient)
 {
     public async Task<RespostaOutputDto<List<PedidoOutputDto>>> GetPedidos()
     {
-        return await httpClient.GetFromJsonAsync<RespostaOutputDto<List<PedidoOutputDto>>>("api/v1/Pedidos")
-               ?? new RespostaOutputDto<List<PedidoOutputDto>>();
+        try
+        {
+            var response = await httpClient.GetAsync("api/v1/Pedidos");
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return new RespostaOutputDto<List<PedidoOutputDto>> { Erros = ["Sessão expirada. Por favor, faça login novamente."] };
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new RespostaOutputDto<List<PedidoOutputDto>> { Erros = ["Erro ao carregar pedidos do servidor."] };
+            }
+
+            return await response.Content.ReadFromJsonAsync<RespostaOutputDto<List<PedidoOutputDto>>>()
+                   ?? new RespostaOutputDto<List<PedidoOutputDto>>();
+        }
+        catch (Exception ex)
+        {
+            return new RespostaOutputDto<List<PedidoOutputDto>> { Erros = [$"Erro de conexão: {ex.Message}"] };
+        }
     }
 
     public async Task<RespostaOutputDto<PedidoOutputDto>> CriarPedido(CriarPedidoInputDto input)

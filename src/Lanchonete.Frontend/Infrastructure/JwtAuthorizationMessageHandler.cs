@@ -7,11 +7,19 @@ public sealed class JwtAuthorizationMessageHandler(ILocalStorageService localSto
 {
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var token = await localStorage.GetItemAsync<string>("authToken", cancellationToken);
-
-        if (!string.IsNullOrWhiteSpace(token))
+        try
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var token = await localStorage.GetItemAsync<string>("authToken", cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                token = token.Trim().Trim('"');
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+        }
+        catch
+        {
+            // JS Interop pode não estar disponível no primeiro ciclo de renderização
         }
 
         return await base.SendAsync(request, cancellationToken);

@@ -11,12 +11,19 @@ public sealed class CustomAuthenticationStateProvider(ILocalStorageService local
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await localStorage.GetItemAsync<string>("authToken");
+        try
+        {
+            var token = await localStorage.GetItemAsync<string>("authToken");
 
-        if (string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(token))
+                return new AuthenticationState(_anonymous);
+
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt")));
+        }
+        catch (Exception) // JS Interop pode não estar pronto no primeiro ciclo
+        {
             return new AuthenticationState(_anonymous);
-
-        return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt")));
+        }
     }
 
     public void NotifyUserAuthentication(string token)
