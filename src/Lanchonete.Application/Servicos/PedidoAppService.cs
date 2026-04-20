@@ -216,6 +216,7 @@ public class PedidoAppService(
         return new PedidoOutputDto
         {
             Id = pedido.Id,
+            Codigo = pedido.Codigo,
             DataCriacao = pedido.DataCriacao,
             Itens = itens,
             Subtotal = pedido.Subtotal,

@@ -9,6 +9,7 @@ public sealed class PedidoRepositorio : IPedidoRepositorio
 
     public Pedido Criar(Pedido pedido)
     {
+        pedido.Codigo = Pedidos.Count == 0 ? 1 : Pedidos.Max(x => x.Codigo) + 1;
         Pedidos.Add(pedido);
         return pedido;
     }

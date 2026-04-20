@@ -8,15 +8,25 @@
 <div class="animate-fade-in-up">
     <div class="glass-card home-card">
         <div class="header-section">
-            <div class="logo-icon-small">
-                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
+            <div class="welcome-section">
+                <div class="logo-icon-small">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h2>Bem-vindo à Good Burger</h2>
+                    <p class="subtitle">Gerencie seus pedidos com facilidade.</p>
+                </div>
             </div>
-            <div>
-                <h2>Bem-vindo à Good Burger</h2>
-                <p class="subtitle">Gerencie seus pedidos com facilidade.</p>
+
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" 
+                       placeholder="Busque o pedido..." 
+                       @bind="_searchQuery" 
+                       @bind:event="oninput" />
             </div>
         </div>
 
@@ -35,7 +45,7 @@
             }
             else if (_pedidos.Count == 0)
             {
-                <p class="status-msg">Nenhum pedido encontrado.</p>
+                <p class="status-msg">Nenhum pedido encontrado @(string.IsNullOrEmpty(_searchQuery) ? "" : $"para '{_searchQuery}'").</p>
             }
             else
             {
@@ -45,7 +55,7 @@
                         {
                             <div class="order-item">
                                 <div class="order-row-header">
-                                    <span class="order-id">#@(pedido.Id.ToString().Length > 8 ? pedido.Id.ToString().Substring(0, 8) : pedido.Id.ToString())</span>
+                                    <span class="order-id">#@pedido.Codigo</span>
                                     <span class="order-date">@pedido.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
                                     
                                     <div class="order-actions">
@@ -110,12 +120,16 @@
     private List<PedidoOutputDto> _pedidos = [];
     private bool _isLoading = true;
     private string? _erroMensagem;
+    private string _searchQuery = "";
 
-    // Paginação
+    private List<PedidoOutputDto> PedidosFiltrados => string.IsNullOrWhiteSpace(_searchQuery)
+        ? _pedidos
+        : _pedidos.Where(p => p.Codigo.ToString().Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+
     private int _paginaAtual = 1;
     private const int ItensPorPagina = 8;
-    private int TotalPaginas => (int)Math.Ceiling((double)_pedidos.Count / ItensPorPagina);
-    private IEnumerable<PedidoOutputDto> PedidosPaginados => _pedidos
+    private int TotalPaginas => (int)Math.Ceiling((double)PedidosFiltrados.Count / ItensPorPagina);
+    private IEnumerable<PedidoOutputDto> PedidosPaginados => PedidosFiltrados
         .Skip((_paginaAtual - 1) * ItensPorPagina)
         .Take(ItensPorPagina);
 
@@ -155,7 +169,7 @@
             else
                 _pedidos = response.Dados?.OrderByDescending(p => p.DataCriacao).ToList() ?? [];
             
-            _paginaAtual = 1; // Reseta para a primeira página ao recarregar
+            _paginaAtual = 1; 
         }
         catch (Exception ex)
         {
@@ -199,7 +213,6 @@
                 _pedidos.RemoveAll(p => p.Id == _pedidoIdParaExcluir);
                 _isDeleteModalVisible = false;
                 
-                // Ajusta página atual se ficar vazia
                 if (_paginaAtual > TotalPaginas && _paginaAtual > 1) 
                     _paginaAtual = TotalPaginas;
             }
