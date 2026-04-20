@@ -1,0 +1,108 @@
+@page "/cardapio"
+@using Lanchonete.Frontend.Models.Cardapio
+@using Lanchonete.Frontend.Services
+@using Lanchonete.Frontend.Components.UI
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<div class="animate-fade-in-up cardapio-container">
+    <div class="header-section">
+        <h2 class="title">Nosso Cardápio</h2>
+        <p class="subtitle">Descubra os sabores da Good Burger</p>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="loading-center">
+            <LoadingSpinner />
+            <p>Carregando delícias...</p>
+        </div>
+    }
+    else
+    {
+        @* ── SEÇÃO DE COMBOS ── *@
+        <div class="combos-highlight">
+            <div class="combo-banner glass-card">
+                <div class="combo-info">
+                    <span class="badge">PROMOÇÃO</span>
+                    <h3>Combos Good Burger</h3>
+                    <p>Peça seu sanduíche com acompanhamentos e ganhe descontos imperdíveis!</p>
+                </div>
+                <div class="combo-grid">
+                    <div class="combo-item">
+                        <span class="percent">20% OFF</span>
+                        <span class="desc">Sanduíche + Batata + Bebida</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="percent">15% OFF</span>
+                        <span class="desc">Sanduíche + Bebida</span>
+                    </div>
+                    <div class="combo-item">
+                        <span class="percent">10% OFF</span>
+                        <span class="desc">Sanduíche + Batata</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* ── CATEGORIAS ── *@
+        <div class="categories-section">
+            @foreach (var categoria in new[] { "Sanduiche", "Batata", "Bebida" })
+            {
+                var itensCategoria = _itens.Where(i => i.Categoria == categoria).ToList();
+                if (itensCategoria.Any())
+                {
+                    <div class="category-group">
+                        <h4 class="category-title">
+                            @if (categoria == "Sanduiche") { <i class="bi bi-burger"></i> <span>Sanduíches</span> }
+                            else if (categoria == "Batata") { <i class="bi bi-fries"></i> <span>Acompanhamentos</span> }
+                            else { <i class="bi bi-cup-straw"></i> <span>Bebidas</span> }
+                        </h4>
+                        <div class="items-grid">
+                            @foreach (var item in itensCategoria)
+                            {
+                                <div class="item-card glass-card">
+                                    <div class="item-visual">
+                                        <div class="item-icon">
+                                            @if (categoria == "Sanduiche") { <span class="emoji">🍔</span> }
+                                            else if (categoria == "Batata") { <span class="emoji">🍟</span> }
+                                            else { <span class="emoji">🥤</span> }
+                                        </div>
+                                    </div>
+                                    <div class="item-details">
+                                        <h5>@item.Nome</h5>
+                                        <span class="price">@item.Preco.ToString("C")</span>
+                                        <button class="glass-btn small" @onclick='() => Navigation.NavigateTo("novo-pedido")'>
+                                            Pedir
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] private CardapioService CardapioService { get; set; } = default!;
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private List<CardapioItemOutputDto> _itens = [];
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await CardapioService.GetItens();
+            _itens = response.Dados ?? [];
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
