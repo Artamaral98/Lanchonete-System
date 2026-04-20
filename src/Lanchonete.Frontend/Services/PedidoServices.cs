@@ -1,5 +1,7 @@
 using System.Net.Http.Json;
-using Lanchonete.Frontend.Models;
+using Lanchonete.Frontend.Models.Pedidos;
+using Lanchonete.Frontend.Models.Cardapio;
+using Lanchonete.Frontend.Models.Compartilhado;
 
 namespace Lanchonete.Frontend.Services;
 

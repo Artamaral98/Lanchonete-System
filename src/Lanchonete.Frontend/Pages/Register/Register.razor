@@ -80,17 +80,28 @@
         _isLoading = true;
         _erros.Clear();
 
-        var resultado = await AuthService.Register(_registerModel);
+        try
+        {
+            var resultado = await AuthService.Register(_registerModel);
 
-        if (resultado.Erros.Any())
-        {
-            _erros = resultado.Erros;
-            _isLoading = false;
+            if (resultado?.Erros?.Any() == true)
+            {
+                _erros = resultado.Erros;
+            }
+            else
+            {
+                ToastService.ShowSuccess("Conta criada com sucesso!");
+                Navigation.NavigateTo("/");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            ToastService.ShowSuccess("Conta criada com sucesso!");
-            Navigation.NavigateTo("");
+            _erros = new List<string> { "Erro inesperado: " + ex.Message };
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
         }
     }
 }

@@ -45,7 +45,17 @@
                             <div class="order-row-header">
                                 <span class="order-id">#@(pedido.Id.ToString().Length > 8 ? pedido.Id.ToString().Substring(0, 8) : pedido.Id.ToString())</span>
                                 <span class="order-date">@pedido.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
-                                <span class="order-total">Total: @pedido.Total.ToString("C")</span>
+                                
+                                <div class="order-actions">
+                                    <button class="action-btn edit" title="Editar Pedido" @onclick="() => IrParaEditar(pedido.Id)">
+                                        <span class="bi bi-pencil-fill"></span>
+                                    </button>
+                                    <button class="action-btn delete" title="Excluir Pedido" @onclick="() => ConfirmarExclusao(pedido.Id)">
+                                        <span class="bi bi-trash-fill"></span>
+                                    </button>
+                                </div>
+
+                                <span class="order-total">@pedido.Total.ToString("C")</span>
                             </div>
                             <div class="order-items-list">
                                 @if (pedido.Itens != null)
@@ -71,6 +81,8 @@
 @code {
     [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
     [Inject] private PedidoService PedidoService { get; set; } = default!;
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+    [Inject] private ToastService ToastService { get; set; } = default!;
 
     private List<PedidoOutputDto> _pedidos = [];
     private bool _isLoading = true;
@@ -107,7 +119,30 @@
         finally
         {
             _isLoading = false;
-            StateHasChanged(); // necessário pois OnAfterRender não re-renderiza automaticamente
+            StateHasChanged();
+        }
+    }
+
+    private void IrParaEditar(Guid id)
+    {
+        Navigation.NavigateTo($"/editar-pedido/{id}");
+    }
+
+    private async Task ConfirmarExclusao(Guid id)
+    {
+        // Em uma versão premium, usaríamos um modal customizado. 
+        // Para agora, usaremos o confirm nativo ou apenas executaremos.
+        var response = await PedidoService.RemoverPedido(id);
+        
+        if (response)
+        {
+            ToastService.ShowSuccess("Pedido removido com sucesso.");
+            _pedidos.RemoveAll(p => p.Id == id);
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.ShowError("Erro ao remover o pedido.");
         }
     }
 }

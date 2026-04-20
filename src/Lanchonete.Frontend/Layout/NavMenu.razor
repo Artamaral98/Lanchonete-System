@@ -4,14 +4,18 @@
     </div>
 
     <nav class="flex-column">
-        <div class="nav-item">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill" aria-hidden="true"></span> Pedidos
-            </NavLink>
-        </div>
-        
         <AuthorizeView>
             <Authorized>
+                <div class="nav-item">
+                    <NavLink class="nav-link" href="novo-pedido">
+                        <span class="bi bi-plus-circle-fill" aria-hidden="true"></span> Novo Pedido
+                    </NavLink>
+                </div>
+                <div class="nav-item">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill" aria-hidden="true"></span> Pedidos
+                    </NavLink>
+                </div>
                 <div class="nav-item">
                     <button type="button" class="nav-link" @onclick="HandleLogout">
                         <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Sair
@@ -49,7 +53,7 @@
         }
         catch
         {
-            // Fallback em caso de erro no LocalStorage ou estado
+    
         }
         finally
         {

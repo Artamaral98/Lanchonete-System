@@ -83,8 +83,8 @@ builder.Services.AdicionarInfraestrutura(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseMiddleware<TratamentoExcecaoMiddleware>();
 app.UseCors("BlazorCors");
+app.UseMiddleware<TratamentoExcecaoMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>

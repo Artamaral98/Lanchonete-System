@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using Lanchonete.Frontend.Infrastructure;
 using Lanchonete.Frontend.Models;
+using Lanchonete.Frontend.Models.Compartilhado;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Lanchonete.Frontend.Services;

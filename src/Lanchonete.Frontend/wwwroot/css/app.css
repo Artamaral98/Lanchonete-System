@@ -15,6 +15,10 @@
     --bg-gradient: linear-gradient(135deg, #0f0f1a, #1a0f2e, #0f1a1a);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     height: 100%;
     margin: 0;

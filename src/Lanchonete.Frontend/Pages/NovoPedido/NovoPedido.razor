@@ -1,0 +1,382 @@
+@page "/novo-pedido"
+@using Microsoft.AspNetCore.Authorization
+@using Lanchonete.Frontend.Models
+@using Lanchonete.Frontend.Services
+@using Lanchonete.Frontend.Components.UI
+@attribute [Authorize]
+@inject CardapioService CardapioService
+@inject PedidoService PedidoService
+@inject NavigationManager NavigationManager
+@inject ToastService ToastService
+
+<div class="novo-pedido-container">
+
+    @if (_isLoading)
+    {
+        <div class="loading-wrapper">
+            <LoadingSpinner />
+        </div>
+    }
+    else
+    {
+        <h2 class="page-title">
+            Novo Pedido
+            <span class="page-subtitle">Selecione os itens abaixo</span>
+        </h2>
+
+        @* ── COMBOS ── *@
+        <p class="section-label">🥊 Combos com desconto</p>
+        <div class="combos-row">
+            <div class="combo-card @(_comboAtivo == "completo" ? "ativo" : "")"
+                 @onclick='() => SelecionarCombo("completo")'>
+                <div class="combo-info">
+                    <span class="combo-title">Combo Completo</span>
+                    <span class="combo-desc">Sanduíche + Batata + Bebida</span>
+                </div>
+                <span class="combo-discount @(_comboAtivo == "completo" ? "ativo" : "")">20%</span>
+            </div>
+
+            <div class="combo-card @(_comboAtivo == "duploA" ? "ativo" : "")"
+                 @onclick='() => SelecionarCombo("duploA")'>
+                <div class="combo-info">
+                    <span class="combo-title">Duplo A</span>
+                    <span class="combo-desc">Sanduíche + Bebida</span>
+                </div>
+                <span class="combo-discount @(_comboAtivo == "duploA" ? "ativo" : "")">15%</span>
+            </div>
+
+            <div class="combo-card @(_comboAtivo == "duploB" ? "ativo" : "")"
+                 @onclick='() => SelecionarCombo("duploB")'>
+                <div class="combo-info">
+                    <span class="combo-title">Duplo B</span>
+                    <span class="combo-desc">Sanduíche + Batata</span>
+                </div>
+                <span class="combo-discount @(_comboAtivo == "duploB" ? "ativo" : "")">10%</span>
+            </div>
+        </div>
+
+        @* ── ITENS: SANDUÍCHES + BATATAS | BEBIDAS ── *@
+        <div class="cats-grid">
+
+            @* Coluna esquerda *@
+            <div>
+                <p class="section-label categoria-title">🥪 Sanduíches</p>
+                <div class="categoria-section">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == CatSanduiche))
+                    {
+                        var selecionado = _sanduicheSelecionado?.Id == item.Id;
+                        var bloqueado   = IsBloqueado(item);
+                        <div class="item-card @(selecionado ? "selecionado" : "") @(bloqueado ? "bloqueado" : "")"
+                             @onclick="() => SelecionarItem(item)">
+                            <div class="item-check">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="white"
+                                     stroke-width="2.5" stroke-linecap="round">
+                                    <polyline points="2,6 5,9 10,3" />
+                                </svg>
+                            </div>
+                            <span class="item-category-icon">🥪</span>
+                            <div class="item-header">
+                                <span class="item-name">@item.Nome</span>
+                            </div>
+                            <span class="item-price">R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+
+                <p class="section-label categoria-title" style="margin-top: 8px">🍟 Batatas</p>
+                <div class="categoria-section">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == CatBatata))
+                    {
+                        var selecionado = _batataSelecionada?.Id == item.Id;
+                        var bloqueado   = IsBloqueado(item);
+                        <div class="item-card @(selecionado ? "selecionado" : "") @(bloqueado ? "bloqueado" : "")"
+                             @onclick="() => SelecionarItem(item)">
+                            <div class="item-check">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="white"
+                                     stroke-width="2.5" stroke-linecap="round">
+                                    <polyline points="2,6 5,9 10,3" />
+                                </svg>
+                            </div>
+                            <span class="item-category-icon">🍟</span>
+                            <div class="item-header">
+                                <span class="item-name">@item.Nome</span>
+                            </div>
+                            <span class="item-price">R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Coluna direita *@
+            <div>
+                <p class="section-label categoria-title">🥤 Bebidas</p>
+                <div class="categoria-section">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == CatBebida))
+                    {
+                        var selecionado = _bebidaSelecionada?.Id == item.Id;
+                        var bloqueado   = IsBloqueado(item);
+                        <div class="item-card @(selecionado ? "selecionado" : "") @(bloqueado ? "bloqueado" : "")"
+                             @onclick="() => SelecionarItem(item)">
+                            <div class="item-check">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="white"
+                                     stroke-width="2.5" stroke-linecap="round">
+                                    <polyline points="2,6 5,9 10,3" />
+                                </svg>
+                            </div>
+                            <span class="item-category-icon">🥤</span>
+                            <div class="item-header">
+                                <span class="item-name">@item.Nome</span>
+                            </div>
+                            <span class="item-price">R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @* ── RESUMO FIXO NO RODAPÉ ── *@
+    <div class="resumo-rodape">
+        <div class="resumo-content">
+            <div class="resumo-details">
+                @foreach (var item in ItensCarrinho)
+                {
+                    <div class="resumo-line">
+                        <span>@item.Nome</span>
+                        <span>R$ @item.Preco.ToString("F2")</span>
+                    </div>
+                }
+                @if (PercentualDesconto > 0)
+                {
+                    <div class="resumo-line discount">
+                        <span>Desconto (@PercentualDesconto%)</span>
+                        <span>- R$ @ValorDesconto.ToString("F2")</span>
+                    </div>
+                }
+                <div class="resumo-line total">
+                    <span>Total</span>
+                    <span>R$ @Total.ToString("F2")</span>
+                </div>
+            </div>
+
+            <div class="resumo-actions">
+                @if (ItensCarrinho.Count > 0)
+                {
+                    <button class="glass-btn secondary" @onclick="DeselecionarCombo"
+                            disabled="@_isEnviando">
+                        Limpar
+                    </button>
+                }
+                <button class="glass-btn primary" @onclick="FinalizarPedido"
+                        disabled="@(_isEnviando || _isLoading)">
+                    @if (_isEnviando)
+                    {
+                        <LoadingSpinner Small="true" />
+                        <span>Enviando...</span>
+                    }
+                    else
+                    {
+                        <span>Finalizar Pedido →</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private List<CardapioItemOutputDto> _cardapio = [];
+    private CardapioItemOutputDto? _sanduicheSelecionado;
+    private CardapioItemOutputDto? _batataSelecionada;
+    private CardapioItemOutputDto? _bebidaSelecionada;
+    private string? _comboAtivo; 
+    private bool _isLoading = true;
+    private bool _isEnviando = false;
+
+    private const string CatSanduiche = "Sanduiche";
+    private const string CatBatata = "Batata";
+    private const string CatBebida = "Bebida";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var response = await CardapioService.GetItens();
+            if (response.Dados != null)
+            {
+                _cardapio = response.Dados;
+            }
+            else if (response.Erros.Count > 0)
+            {
+                ToastService.ShowError(string.Join(", ", response.Erros));
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError("Erro ao carregar cardápio: " + ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private List<CardapioItemOutputDto> ItensCarrinho
+    {
+        get
+        {
+            var itens = new List<CardapioItemOutputDto>();
+            if (_sanduicheSelecionado != null) itens.Add(_sanduicheSelecionado);
+            if (_batataSelecionada != null) itens.Add(_batataSelecionada);
+            if (_bebidaSelecionada != null) itens.Add(_bebidaSelecionada);
+            return itens;
+        }
+    }
+
+    private decimal Subtotal => ItensCarrinho.Sum(i => i.Preco);
+
+    private int PercentualDesconto
+    {
+        get
+        {
+            if (_sanduicheSelecionado != null && _batataSelecionada != null && _bebidaSelecionada != null)
+                return 20;
+            if (_sanduicheSelecionado != null && _bebidaSelecionada != null)
+                return 15;
+            if (_sanduicheSelecionado != null && _batataSelecionada != null)
+                return 10;
+            return 0;
+        }
+    }
+
+    private decimal ValorDesconto => Subtotal * PercentualDesconto / 100m;
+
+    private decimal Total => Subtotal - ValorDesconto;
+
+    private void SelecionarCombo(string combo)
+    {
+        _comboAtivo = combo;
+        
+        var primeiroSanduiche = _cardapio.FirstOrDefault(i => i.Categoria == CatSanduiche);
+        var primeiraBatata = _cardapio.FirstOrDefault(i => i.Categoria == CatBatata);
+        var primeiraBebida = _cardapio.FirstOrDefault(i => i.Categoria == CatBebida);
+
+        _sanduicheSelecionado = null;
+        _batataSelecionada = null;
+        _bebidaSelecionada = null;
+
+        if (combo == "completo")
+        {
+            _sanduicheSelecionado = primeiroSanduiche;
+            _batataSelecionada = primeiraBatata;
+            _bebidaSelecionada = primeiraBebida;
+        }
+        else if (combo == "duploA")
+        {
+            _sanduicheSelecionado = primeiroSanduiche;
+            _bebidaSelecionada = primeiraBebida;
+        }
+        else if (combo == "duploB")
+        {
+            _sanduicheSelecionado = primeiroSanduiche;
+            _batataSelecionada = primeiraBatata;
+        }
+    }
+
+    private void DeselecionarCombo()
+    {
+        _comboAtivo = null;
+        _sanduicheSelecionado = null;
+        _batataSelecionada = null;
+        _bebidaSelecionada = null;
+    }
+
+    private void SelecionarItem(CardapioItemOutputDto item)
+    {
+        if (_comboAtivo != null)
+        {
+            _comboAtivo = null;
+        }
+
+        if (item.Categoria == CatSanduiche)
+        {
+            if (_sanduicheSelecionado?.Id == item.Id)
+                _sanduicheSelecionado = null; 
+            else
+                _sanduicheSelecionado = item; 
+        }
+        else if (item.Categoria == CatBatata)
+        {
+            if (_batataSelecionada?.Id == item.Id)
+                _batataSelecionada = null;
+            else
+                _batataSelecionada = item;
+        }
+        else if (item.Categoria == CatBebida)
+        {
+            if (_bebidaSelecionada?.Id == item.Id)
+                _bebidaSelecionada = null;
+            else
+                _bebidaSelecionada = item;
+        }
+    }
+
+    private bool IsBloqueado(CardapioItemOutputDto item)
+    {
+        if (item.Categoria == CatSanduiche)
+            return _sanduicheSelecionado != null && _sanduicheSelecionado.Id != item.Id;
+        
+        if (item.Categoria == CatBatata)
+            return _batataSelecionada != null && _batataSelecionada.Id != item.Id;
+            
+        if (item.Categoria == CatBebida)
+            return _bebidaSelecionada != null && _bebidaSelecionada.Id != item.Id;
+
+        return false;
+    }
+
+    private async Task FinalizarPedido()
+    {
+        if (ItensCarrinho.Count == 0)
+        {
+            ToastService.ShowError("Selecione ao menos um item para fazer o pedido.");
+            return;
+        }
+
+        _isEnviando = true;
+
+        try
+        {
+            var dto = new CriarPedidoInputDto
+            {
+                Itens = ItensCarrinho.Select(i => new PedidoItemInputDto
+                {
+                    CardapioItemId = i.Id,
+                    Quantidade = 1 
+                }).ToList()
+            };
+
+            var response = await PedidoService.CriarPedido(dto);
+
+            if (response.Erros.Count > 0)
+            {
+                ToastService.ShowError(string.Join(", ", response.Erros));
+            }
+            else
+            {
+                ToastService.ShowSuccess("Pedido realizado com sucesso!");
+                NavigationManager.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError("Erro ao enviar pedido: " + ex.Message);
+        }
+        finally
+        {
+            _isEnviando = false;
+        }
+    }
+}
