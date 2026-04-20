@@ -1,0 +1,8 @@
+<div class="spinner-container @(Small ? "small" : "")">
+    <div class="spinner-ring"></div>
+    <div class="spinner-glass"></div>
+</div>
+
+@code {
+    [Parameter] public bool Small { get; set; }
+}

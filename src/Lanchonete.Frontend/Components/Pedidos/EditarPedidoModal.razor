@@ -1,0 +1,246 @@
+@using Lanchonete.Frontend.Models.Pedidos
+@using Lanchonete.Frontend.Models.Cardapio
+@using Lanchonete.Frontend.Models.Compartilhado
+@using Lanchonete.Frontend.Services
+@using Lanchonete.Frontend.Components.UI
+
+@inject PedidoService PedidoService
+@inject CardapioService CardapioService
+@inject ToastService ToastService
+
+<Modal Title="Editar Pedido" IsVisible="IsVisible" OnClose="Close">
+    @if (_isLoading)
+    {
+        <div class="modal-loading">
+            <LoadingSpinner />
+            <p>Carregando dados do pedido...</p>
+        </div>
+    }
+    else
+    {
+        <div class="edit-pedido-content">
+            @* ── CATEGORIAS ── *@
+            <div class="edit-section">
+                <p class="section-label">🥪 Sanduíche</p>
+                <div class="item-selector">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == "Sanduiche"))
+                    {
+                        var sel = _sanduiche?.Id == item.Id;
+                        <div class="mini-item-card @(sel ? "ativo" : "")" @onclick="() => SelecionarItem(item)">
+                            <span>@item.Nome</span>
+                            <span>R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                    <div class="mini-item-card remover @(_sanduiche == null ? "ativo" : "")" @onclick="() => _sanduiche = null">
+                        <span>Nenhum</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-section">
+                <p class="section-label">🍟 Batata</p>
+                <div class="item-selector">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == "Batata"))
+                    {
+                        var sel = _batata?.Id == item.Id;
+                        <div class="mini-item-card @(sel ? "ativo" : "")" @onclick="() => SelecionarItem(item)">
+                            <span>@item.Nome</span>
+                            <span>R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                    <div class="mini-item-card remover @(_batata == null ? "ativo" : "")" @onclick="() => _batata = null">
+                        <span>Nenhuma</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-section">
+                <p class="section-label">🥤 Bebida</p>
+                <div class="item-selector">
+                    @foreach (var item in _cardapio.Where(i => i.Categoria == "Bebida"))
+                    {
+                        var sel = _bebida?.Id == item.Id;
+                        <div class="mini-item-card @(sel ? "ativo" : "")" @onclick="() => SelecionarItem(item)">
+                            <span>@item.Nome</span>
+                            <span>R$ @item.Preco.ToString("F2")</span>
+                        </div>
+                    }
+                    <div class="mini-item-card remover @(_bebida == null ? "ativo" : "")" @onclick="() => _bebida = null">
+                        <span>Nenhuma</span>
+                    </div>
+                </div>
+            </div>
+
+            @* ── RESUMO E DESCONTO ── *@
+            <div class="edit-summary">
+                <div class="summary-line">
+                    <span>Subtotal:</span>
+                    <span>@Subtotal.ToString("C")</span>
+                </div>
+                @if (PercentualDesconto > 0)
+                {
+                    <div class="summary-line discount">
+                        <span>Desconto (@PercentualDesconto%):</span>
+                        <span>- @ValorDesconto.ToString("C")</span>
+                    </div>
+                }
+                <div class="summary-line total">
+                    <span>Total Atualizado:</span>
+                    <span>@Total.ToString("C")</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="glass-btn secondary" @onclick="Close">Cancelar</button>
+                <button class="glass-btn primary" @onclick="SalvarAlteracoes" disabled="@_isSalvando">
+                    @if (_isSalvando)
+                    {
+                        <LoadingSpinner Small="true" />
+                        <span>Salvando...</span>
+                    }
+                    else
+                    {
+                        <span>Salvar Alterações</span>
+                    }
+                </button>
+            </div>
+        </div>
+    }
+</Modal>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public Guid PedidoId { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnSuccess { get; set; }
+
+    private List<CardapioItemOutputDto> _cardapio = [];
+    private CardapioItemOutputDto? _sanduiche;
+    private CardapioItemOutputDto? _batata;
+    private CardapioItemOutputDto? _bebida;
+
+    private bool _isLoading = true;
+    private bool _isSalvando = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && PedidoId != Guid.Empty)
+        {
+            await CarregarDados();
+        }
+    }
+
+    private async Task CarregarDados()
+    {
+        _isLoading = true;
+        try
+        {
+            // Carrega cardápio se vazio
+            if (!_cardapio.Any())
+            {
+                var respCardapio = await CardapioService.GetItens();
+                _cardapio = respCardapio.Dados ?? [];
+            }
+
+            // Carrega pedido
+            var respPedido = await PedidoService.GetPedidoById(PedidoId);
+            if (respPedido.Dados != null)
+            {
+                MapearItens(respPedido.Dados);
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError("Erro ao carregar dados: " + ex.Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void MapearItens(PedidoOutputDto pedido)
+    {
+        _sanduiche = null;
+        _batata = null;
+        _bebida = null;
+
+        foreach (var item in pedido.Itens)
+        {
+            var itemCardapio = _cardapio.FirstOrDefault(i => i.Nome == item.NomeItem);
+            if (itemCardapio == null) continue;
+
+            if (itemCardapio.Categoria == "Sanduiche") _sanduiche = itemCardapio;
+            else if (itemCardapio.Categoria == "Batata") _batata = itemCardapio;
+            else if (itemCardapio.Categoria == "Bebida") _bebida = itemCardapio;
+        }
+    }
+
+    private void SelecionarItem(CardapioItemOutputDto item)
+    {
+        if (item.Categoria == "Sanduiche") _sanduiche = item;
+        else if (item.Categoria == "Batata") _batata = item;
+        else if (item.Categoria == "Bebida") _bebida = item;
+    }
+
+    private decimal Subtotal => (new[] { _sanduiche, _batata, _bebida }).Where(i => i != null).Sum(i => i!.Preco);
+
+    private int PercentualDesconto
+    {
+        get
+        {
+            if (_sanduiche != null && _batata != null && _bebida != null) return 20;
+            if (_sanduiche != null && _bebida != null) return 15;
+            if (_sanduiche != null && _batata != null) return 10;
+            return 0;
+        }
+    }
+
+    private decimal ValorDesconto => Subtotal * PercentualDesconto / 100m;
+    private decimal Total => Subtotal - ValorDesconto;
+
+    private async Task SalvarAlteracoes()
+    {
+        _isSalvando = true;
+        try
+        {
+            var itens = new List<PedidoItemInputDto>();
+            if (_sanduiche != null) itens.Add(new PedidoItemInputDto { CardapioItemId = _sanduiche.Id, Quantidade = 1 });
+            if (_batata != null) itens.Add(new PedidoItemInputDto { CardapioItemId = _batata.Id, Quantidade = 1 });
+            if (_bebida != null) itens.Add(new PedidoItemInputDto { CardapioItemId = _bebida.Id, Quantidade = 1 });
+
+            if (!itens.Any())
+            {
+                ToastService.ShowError("O pedido não pode ficar vazio.");
+                return;
+            }
+
+            var input = new AtualizarPedidoInputDto { Itens = itens };
+            var resp = await PedidoService.AtualizarPedido(PedidoId, input);
+
+            if (resp.Erros.Any())
+            {
+                ToastService.ShowError(string.Join(", ", resp.Erros));
+            }
+            else
+            {
+                ToastService.ShowSuccess("Pedido atualizado com sucesso!");
+                await OnSuccess.InvokeAsync();
+                await Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError("Erro ao salvar: " + ex.Message);
+        }
+        finally
+        {
+            _isSalvando = false;
+        }
+    }
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
+    }
+}

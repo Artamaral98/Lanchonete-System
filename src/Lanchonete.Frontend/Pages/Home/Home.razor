@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Lanchonete.Frontend.Models
 @using Lanchonete.Frontend.Services
+@using Lanchonete.Frontend.Components.Pedidos
 @attribute [Authorize]
 
 <div class="animate-fade-in-up">
@@ -78,6 +79,18 @@
     </div>
 </div>
 
+<EditarPedidoModal 
+    IsVisible="_isModalVisible" 
+    PedidoId="_pedidoIdParaEditar" 
+    OnClose="() => _isModalVisible = false"
+    OnSuccess="RecarregarPedidos" />
+
+<ConfirmacaoModal
+    IsVisible="_isDeleteModalVisible"
+    IsProcessando="_isExcluindo"
+    OnCancelar="() => _isDeleteModalVisible = false"
+    OnConfirmar="ExecutarExclusao" />
+
 @code {
     [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
     [Inject] private PedidoService PedidoService { get; set; } = default!;
@@ -88,16 +101,28 @@
     private bool _isLoading = true;
     private string? _erroMensagem;
 
+    // Estado dos Modais
+    private bool _isModalVisible;
+    private Guid _pedidoIdParaEditar;
+    
+    private bool _isDeleteModalVisible;
+    private Guid _pedidoIdParaExcluir;
+    private bool _isExcluindo;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+        await RecarregarPedidos();
+    }
 
+    private async Task RecarregarPedidos()
+    {
         try
         {
             _isLoading = true;
             _erroMensagem = null;
+            StateHasChanged();
 
-            // JS Interop garantidamente disponível aqui
             var authState = await AuthStateTask;
             if (authState.User.Identity?.IsAuthenticated != true)
             {
@@ -125,24 +150,42 @@
 
     private void IrParaEditar(Guid id)
     {
-        Navigation.NavigateTo($"/editar-pedido/{id}");
+        _pedidoIdParaEditar = id;
+        _isModalVisible = true;
     }
 
-    private async Task ConfirmarExclusao(Guid id)
+    private void ConfirmarExclusao(Guid id)
     {
-        // Em uma versão premium, usaríamos um modal customizado. 
-        // Para agora, usaremos o confirm nativo ou apenas executaremos.
-        var response = await PedidoService.RemoverPedido(id);
-        
-        if (response)
+        _pedidoIdParaExcluir = id;
+        _isDeleteModalVisible = true;
+    }
+
+    private async Task ExecutarExclusao()
+    {
+        _isExcluindo = true;
+        try
         {
-            ToastService.ShowSuccess("Pedido removido com sucesso.");
-            _pedidos.RemoveAll(p => p.Id == id);
+            var response = await PedidoService.RemoverPedido(_pedidoIdParaExcluir);
+            
+            if (response)
+            {
+                ToastService.ShowSuccess("Pedido removido com sucesso.");
+                _pedidos.RemoveAll(p => p.Id == _pedidoIdParaExcluir);
+                _isDeleteModalVisible = false;
+            }
+            else
+            {
+                ToastService.ShowError("Erro ao remover o pedido.");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError("Erro de conexão: " + ex.Message);
+        }
+        finally
+        {
+            _isExcluindo = false;
             StateHasChanged();
         }
-        else
-        {
-            ToastService.ShowError("Erro ao remover o pedido.");
-        }
     }
-}
+}

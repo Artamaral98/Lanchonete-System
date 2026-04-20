@@ -47,7 +47,13 @@ public sealed class PedidoService(HttpClient httpClient)
                ?? new RespostaOutputDto<PedidoOutputDto>();
     }
 
-    public async Task<RespostaOutputDto<PedidoOutputDto>> AtualizarPedido(Guid id, CriarPedidoInputDto input)
+    public async Task<RespostaOutputDto<PedidoOutputDto>> GetPedidoById(Guid id)
+    {
+        return await httpClient.GetFromJsonAsync<RespostaOutputDto<PedidoOutputDto>>($"api/v1/Pedidos/{id}")
+               ?? new RespostaOutputDto<PedidoOutputDto>();
+    }
+
+    public async Task<RespostaOutputDto<PedidoOutputDto>> AtualizarPedido(Guid id, AtualizarPedidoInputDto input)
     {
         var response = await httpClient.PutAsJsonAsync($"api/v1/Pedidos/{id}", input);
         return await response.Content.ReadFromJsonAsync<RespostaOutputDto<PedidoOutputDto>>()

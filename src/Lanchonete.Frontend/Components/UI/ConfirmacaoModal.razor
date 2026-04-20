@@ -1,0 +1,44 @@
+@using Lanchonete.Frontend.Components.UI
+
+<Modal Title="@Title" IsVisible="IsVisible" OnClose="Cancelar">
+    <div class="confirmacao-content">
+        <div class="confirmacao-icon">
+            <span class="bi bi-exclamation-triangle-fill"></span>
+        </div>
+        <p class="confirmacao-text">@Mensagem</p>
+        
+        <div class="confirmacao-actions">
+            <button class="glass-btn secondary" @onclick="Cancelar">Cancelar</button>
+            <button class="glass-btn danger" @onclick="Confirmar">
+                @if (IsProcessando)
+                {
+                    <LoadingSpinner Small="true" />
+                    <span>Excluindo...</span>
+                }
+                else
+                {
+                    <span>Sim, Excluir</span>
+                }
+            </button>
+        </div>
+    </div>
+</Modal>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirmar Exclusão";
+    [Parameter] public string Mensagem { get; set; } = "Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.";
+    [Parameter] public bool IsProcessando { get; set; }
+    [Parameter] public EventCallback OnConfirmar { get; set; }
+    [Parameter] public EventCallback OnCancelar { get; set; }
+
+    private async Task Confirmar()
+    {
+        await OnConfirmar.InvokeAsync();
+    }
+
+    private async Task Cancelar()
+    {
+        await OnCancelar.InvokeAsync();
+    }
+}
