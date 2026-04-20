@@ -20,7 +20,7 @@ public sealed class CustomAuthenticationStateProvider(ILocalStorageService local
 
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(token), "jwt")));
         }
-        catch (Exception) // JS Interop pode não estar pronto no primeiro ciclo
+        catch (Exception)
         {
             return new AuthenticationState(_anonymous);
         }

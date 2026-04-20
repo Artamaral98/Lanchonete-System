@@ -113,3 +113,42 @@ html, body {
 .animate-fade-in-up {
     animation: fade-in-up 0.4s ease forwards;
 }
+
+/* ── Blazor error UI ────────────────────────────────────────── */
+#blazor-error-ui {
+    background: rgba(20, 10, 40, 0.95);
+    border-top: 1px solid rgba(255, 100, 100, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 20px;
+    display: none;              /* oculto por padrão */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    align-items: center;
+    gap: 12px;
+}
+
+#blazor-error-ui.blazor-error-ui-shown {
+    display: flex;              /* Blazor adiciona essa classe em erros reais */
+}
+
+#blazor-error-ui a.reload {
+    color: rgba(108, 63, 255, 0.9);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#blazor-error-ui span.dismiss {
+    cursor: pointer;
+    margin-left: auto;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+#blazor-error-ui span.dismiss:hover {
+    opacity: 1;
+}
