@@ -164,6 +164,12 @@ public class PedidoAppService(
         if (itensComCardapio.Any(x => x.Item.Quantidade > 1 && x.Cardapio.Categoria == CategoriaItemCardapio.Sanduiche))
             throw new BusinessException(Messages.PedidoMuitosSanduiches);
 
+        if (itensComCardapio.Any(x => x.Item.Quantidade > 1 && x.Cardapio.Categoria == CategoriaItemCardapio.Batata))
+            throw new BusinessException(Messages.PedidoMuitasBatatas);
+
+        if (itensComCardapio.Any(x => x.Item.Quantidade > 1 && x.Cardapio.Categoria == CategoriaItemCardapio.Bebida))
+            throw new BusinessException(Messages.PedidoMuitasBebidas);
+
         if (itensComCardapio.Any(x => x.Item.Quantidade > 1))
             throw new BusinessException(Messages.PedidoComItensDuplicados);
 
