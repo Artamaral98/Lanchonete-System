@@ -138,6 +138,21 @@ public sealed class PedidoAppServiceTests
         Assert.Contains(Messages.PedidoMuitosSanduiches, resposta.Erros);
     }
 
+    [Fact]
+    public void CriarPedido_DeveRetornarErro_QuandoMaisDeUmaBatata()
+    {
+        var itemBatata = new CardapioItem { Id = Guid.NewGuid(), Nome = "Batata frita", Categoria = CategoriaItemCardapio.Batata };
+        var appService = new PedidoAppService(new PedidoRepositorioFake(), new CardapioRepositorioFake([itemBatata]));
+
+        var resposta = appService.CriarPedido(new CriarPedidoInputDto
+        {
+            Itens = [new PedidoItemInputDto { CardapioItemId = itemBatata.Id, Quantidade = 2 }]
+        });
+
+        Assert.NotEmpty(resposta.Erros);
+        Assert.Contains(Messages.PedidoComItensDuplicados, resposta.Erros);
+    }
+
     [Theory]
     [InlineData(true, true, 0.20)] // Sanduiche + Batata + Refri = 20%
     [InlineData(false, true, 0.15)] // Sanduiche + Refri = 15%

@@ -22,7 +22,7 @@ public class PedidoAppService(
 
             var pedido = new Pedido();
             pedido.Itens = CriarItensPedido(input.Itens);
-            
+
             ProcessarPrecosPedido(pedido);
 
             var pedidoCriado = pedidoRepositorio.Criar(pedido);
@@ -74,7 +74,7 @@ public class PedidoAppService(
             ValidarItensEntrada(entrada.Itens);
 
             pedido.Itens = CriarItensPedido(entrada.Itens);
-            
+
             ProcessarPrecosPedido(pedido);
 
             pedidoRepositorio.Atualizar(pedido);
@@ -115,10 +115,10 @@ public class PedidoAppService(
 
         return (temBatata, temBebida) switch
         {
-            (true, true)   => 0.20m,
-            (false, true)  => 0.15m,
-            (true, false)  => 0.10m,
-            _              => 0m
+            (true, true) => 0.20m,
+            (false, true) => 0.15m,
+            (true, false) => 0.10m,
+            _ => 0m
         };
     }
 
@@ -154,22 +154,20 @@ public class PedidoAppService(
         if (itens.Count == 0)
             throw new BusinessException(Messages.PedidoSemItens);
 
-        var possuiItensDuplicados = itens
-            .GroupBy(x => x.CardapioItemId)
-            .Any(x => x.Count() > 1);
-
-        if (possuiItensDuplicados)
+        if (itens.GroupBy(x => x.CardapioItemId).Any(g => g.Count() > 1))
             throw new BusinessException(Messages.PedidoComItensDuplicados);
 
-        var quantidadeSanduiches = 0;
-        foreach (var item in itens)
-        {
-            var itemCardapio = ObterItemCardapio(item.CardapioItemId);
-            if (itemCardapio.Categoria == CategoriaItemCardapio.Sanduiche)
-                quantidadeSanduiches += item.Quantidade;
-        }
+        var itensComCardapio = itens
+            .Select(i => (Item: i, Cardapio: ObterItemCardapio(i.CardapioItemId)))
+            .ToList();
 
-        if (quantidadeSanduiches > 1)
+        if (itensComCardapio.Any(x => x.Item.Quantidade > 1 && x.Cardapio.Categoria == CategoriaItemCardapio.Sanduiche))
+            throw new BusinessException(Messages.PedidoMuitosSanduiches);
+
+        if (itensComCardapio.Any(x => x.Item.Quantidade > 1))
+            throw new BusinessException(Messages.PedidoComItensDuplicados);
+
+        if (itensComCardapio.Count(x => x.Cardapio.Categoria == CategoriaItemCardapio.Sanduiche) > 1)
             throw new BusinessException(Messages.PedidoMuitosSanduiches);
     }
 
